@@ -14,23 +14,36 @@ app.get("/", (req, res) => {
   res.render("index");
 });
 
-app.post("/send-email", (req, res) => {
-  // El código para enviar el correo electrónico sigue siendo el mismo
-  // ...
+app.post("/send-email", async (req, res) => {
+  const { name, email, subject, message } = req.body;
 
-  // Renderiza la vista de éxito o error después de enviar el correo
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.log(error);
-      res.render("message", { message: "Error al enviar el correo" });
-    } else {
-      console.log("Correo enviado: " + info.response);
-      res.render("message", { message: "Correo enviado correctamente" });
-    }
-  });
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "Gmail",
+      auth: {
+        user: "fabilezcano94@gmail.com",
+        pass: "afwgqjdyaittaklg",
+      },
+    });
+
+    const mailOptions = {
+      from: "tu_correo@gmail.com",
+      to: email,
+      subject: subject,
+      text: `Hola ${name},\n\n${message}`,
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log("Correo enviado correctamente");
+    res.render("message", { message: "Correo enviado correctamente" });
+  } catch (error) {
+    console.error(error);
+    res.render("message", { message: "Error al enviar el correo" });
+  }
 });
 
 const PORT = 4000;
 app.listen(PORT, () => {
-  console.log(`Servidor en ejecución en http://localhost:4000`);
+  console.log(`Servidor en ejecución en http://localhost:${PORT}`);
 });
+
